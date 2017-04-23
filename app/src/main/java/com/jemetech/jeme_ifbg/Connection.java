@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by Lei on 11/27/2016.
@@ -24,6 +25,7 @@ public class Connection {
     private Collection<UpdateListener> listeners = new HashSet<>();
     private Object lock = new Object();
     byte[] data = null;
+    private AtomicBoolean closed = new AtomicBoolean(false);
 
     public Connection() {
         ByteBuffer buffer = ByteBuffer.wrap(header);
@@ -33,6 +35,8 @@ public class Connection {
             @Override
             public void run() {
                 while (true) {
+                    if(closed.get())
+                        return;
                     synchronized (lock) {
                         try {
                             lock.wait();
@@ -57,6 +61,8 @@ public class Connection {
             @Override
             public void run() {
                 while (true) {
+                    if(closed.get())
+                        return;
                     try {
                         in.read(header);
                         headBuffer.rewind();
@@ -106,6 +112,17 @@ public class Connection {
 
     public void addUpdateListener(UpdateListener l) {
         listeners.add(l);
+    }
+
+    public void close() {
+        closed.set(true);
+        if(socket != null) {
+            try{
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static interface UpdateListener {

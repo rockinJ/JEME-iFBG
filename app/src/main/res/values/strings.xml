@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">JEME-iFBG</string>
+    <string name="server">Server:</string>
+    <string name="port">Port:</string>
+    <string name="connect">Connect</string>
+    <string name="cancel">Cancel</string>
+    <string name="title">Connect to server</string>
+    <string name="connecting">Connecting...</string>
+    <string name="ok">OK</string>
+</resources>

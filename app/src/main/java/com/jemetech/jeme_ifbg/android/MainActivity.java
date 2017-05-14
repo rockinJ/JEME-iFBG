@@ -76,7 +76,7 @@ public class MainActivity extends Activity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+                File dir = Environment.getExternalStorageDirectory();
                 Date date = new Date();
                 savingFile = new File(dir, df.format(date) + ".txt");
                 try {
@@ -98,10 +98,11 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 saver.removing = true;
                 saver = null;
-                Toast.makeText(v.getContext(), "File "+savingFile.getName()+" saved into documents directory.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(v.getContext(), "File "+savingFile.getName()+" saved!", Toast.LENGTH_SHORT).show();
                 savingFile = null;
                 saveButton.setText(R.string.save);
                 saveButton.setEnabled(true);
+                finishButton.setEnabled(false);
             }
         });
     }

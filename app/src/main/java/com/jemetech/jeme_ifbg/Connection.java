@@ -101,9 +101,10 @@ public class Connection {
                         }
                         if(saver != null) {
                             saver.save();
-                            if (saver.removing())
+                            if (saver.removing()) {
                                 saver.close();
                                 saver = null;
+                            }
                         }
                         if(length > data.length)
                             in.skip(length-data.length);

@@ -26,6 +26,8 @@ public class Connection {
     private Object lock = new Object();
     byte[] data = null;
     private AtomicBoolean closed = new AtomicBoolean(false);
+    private ISaver saver;
+    private ISaver pendingSaver;
 
     public Connection() {
         ByteBuffer buffer = ByteBuffer.wrap(header);
@@ -75,6 +77,10 @@ public class Connection {
                         short sc = buffer.getShort();
                         if (sensors == null)
                             sensors = new Sensor[sc];
+                        if (pendingSaver != null) {
+                            saver = pendingSaver;
+                            pendingSaver = null;
+                        }
                         for (int i = 0; i < sensors.length; i++) {
                             short size = buffer.getShort();
                             short id = buffer.getShort();
@@ -88,7 +94,16 @@ public class Connection {
                             short minute = buffer.get();
                             int second = buffer.getShort() & 0xffff;
                             float value = buffer.getFloat();
-                            sensors[i].push(new Sensor.Data(second, value));
+                            Sensor.Data aData = new Sensor.Data(year, month, day, hour, minute, second, value);
+                            sensors[i].push(aData);
+                            if(saver != null)
+                                saver.save(aData);
+                        }
+                        if(saver != null) {
+                            saver.save();
+                            if (saver.removing())
+                                saver.close();
+                                saver = null;
                         }
                         if(length > data.length)
                             in.skip(length-data.length);
@@ -102,6 +117,10 @@ public class Connection {
                 }
             }
         }.start();
+    }
+
+    public void setSaver(ISaver saver) {
+        pendingSaver = saver;
     }
 
     private void update() {

@@ -7,4 +7,7 @@
     <string name="title">Connect to server</string>
     <string name="connecting">Connecting...</string>
     <string name="ok">OK</string>
+    <string name="save">Save</string>
+    <string name="saving">Saving</string>
+    <string name="finish">Finish</string>
 </resources>

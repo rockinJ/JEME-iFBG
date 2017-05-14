@@ -5,8 +5,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by Lei on 11/29/2016.
@@ -68,7 +66,7 @@ public class Sensor {
             full = true;
         lock.unlock();
         if(debug)
-            System.out.println("id: "+id+", time: "+d.time+", value: "+d.value);
+            System.out.println("id: "+id+", second: "+d.second +", value: "+d.value);
     }
 
     public void debug(boolean d) {
@@ -83,10 +81,20 @@ public class Sensor {
     }
 
     public static class Data {
-        public long time;
-        public float value;
-        public Data (long time, float value) {
-            this.time = time;
+        public short year;
+        public final short month;
+        public final short day;
+        public final short hour;
+        public final short minute;
+        public final long second;
+        public final float value;
+        public Data(short year, short month, short day, short hour, short minute, long second, float value) {
+            this.year = year;
+            this.month = month;
+            this.day = day;
+            this.hour = hour;
+            this.minute = minute;
+            this.second = second;
             this.value = value;
         }
     }

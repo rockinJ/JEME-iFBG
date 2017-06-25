@@ -19,13 +19,13 @@ public class ConnectionManager {
         return connection;
     }
 
-    public void connect(final String theHost, final int port, final ConnectionListerner listener) {
+    public void connect(final String theHost, final int port, final ConnectionListerner listener, final Sensor.Converter<?> converter) {
         new Thread() {
             @Override
             public void run() {
                 try {
                     Socket socket = new Socket(theHost, port);
-                    connection = new Connection();
+                    connection = new Connection(converter);
                     connection.listen(socket);
                 } catch (UnknownHostException e) {
                     e.printStackTrace();

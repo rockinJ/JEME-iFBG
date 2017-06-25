@@ -35,8 +35,15 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
+
+import lecho.lib.hellocharts.model.Axis;
+import lecho.lib.hellocharts.model.Line;
+import lecho.lib.hellocharts.model.LineChartData;
+import lecho.lib.hellocharts.model.PointValue;
+import lecho.lib.hellocharts.view.LineChartView;
 
 /**
  * Created by Lei on 11/24/2016.
@@ -46,12 +53,13 @@ public class MainActivity extends Activity {
 
     private boolean showingLogin = false;
     private ConnectionManager connectionManager = ConnectionManager.getInstance();
-    private Canvas canvas;
+//    private Canvas canvas;
     private Sensor selectedSensor;
     private Connection connection;
-    private Bitmap bitmap;
-    private DrawingView view;
-    private Paint paint = new Paint();
+//    private Bitmap bitmap;
+//    private DrawingView view;
+    private LineChartView view;
+//    private Paint paint = new Paint();
     private Sensor[] sensors;
     private ListView list;
     private boolean paused = true;
@@ -65,6 +73,8 @@ public class MainActivity extends Activity {
     private Saver saver;
     private File savingFile;
     private SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+    private LineChartData data;
+    private Line line;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,67 +183,71 @@ public class MainActivity extends Activity {
             return;
         if(!selectedSensor.ready())
             return;
-        float range = selectedSensor.max - selectedSensor.min;
-        float base = selectedSensor.min + range / 2f;
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.LTGRAY);
-        canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), paint);
-        Path path = new Path();
-        Iterator<Sensor.Data> data = selectedSensor.getData();
-        if (!data.hasNext())
-            return;
-        int width = canvas.getWidth();
-        int height = canvas.getHeight();
-        float scale = (height - 50) / range;
-        int startX = width-XSTART;
-        int startY = height/2;
-        Sensor.Data d = data.next();
-        Sensor.Data current = d;
-        long last = d.second;
-        float value = d.value;
-        path.moveTo(startX, startY-(value-base)*scale);
-        float max = value;
-        float min = value;
-        while (data.hasNext()) {
-            d = data.next();
-            long interv = last - d.second;
-            if (interv <= 0)
-                interv += 60000;
-            startX -= interv/50f;
-            path.lineTo(startX, startY - (d.value-base)*scale);
-            last = d.second;
-            if(d.value > max)
-                max = d.value;
-            if(d.value < min)
-                min = d.value;
-            if(startX < 0)
-                break;
-        }
-        selectedSensor.max = max;
-        selectedSensor.min = min;
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(Color.BLACK);
-        paint.setAntiAlias(true);
-        canvas.drawPath(path, paint);
-
-        paint.setAntiAlias(false);
-        paint.setColor(Color.DKGRAY);
-        int y = height-XSTART;
-        canvas.drawLine(width, y, 0, y, paint);
-        int x = width-XSTART;
-        canvas.drawLine(x, y-5, x, y, paint);
-        last = current.second;
-        int second = (int) (last/1000);
-        canvas.drawText(""+second+'.'+(last-second*1000), x, y+5, paint);
-        canvas.drawLine(XSTART, 0, XSTART, height, paint);
-        canvas.drawText(""+base, 0, startY, paint);
-        path = new Path();
-        path.moveTo(width, startY);
-        path.lineTo(0, startY);
-        PathEffect pe = new DashPathEffect(new float[]{3, 5}, 0);
-        paint.setPathEffect(pe);
-        canvas.drawPath(path, paint);
-        paint.setPathEffect(null);
+//        float range = selectedSensor.max - selectedSensor.min;
+//        float base = selectedSensor.min + range / 2f;
+//        paint.setStyle(Paint.Style.FILL);
+//        paint.setColor(Color.LTGRAY);
+//        canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), paint);
+//        Path path = new Path();
+//        Iterator<Sensor.Data> data = selectedSensor.getData();
+//        if (!data.hasNext())
+//            return;
+//        int width = canvas.getWidth();
+//        int height = canvas.getHeight();
+//        float scale = (height - 50) / range;
+//        int startX = width-XSTART;
+//        int startY = height/2;
+//        Sensor.Data d = data.next();
+//        Sensor.Data current = d;
+//        long last = d.second;
+//        float value = d.value;
+//        path.moveTo(startX, startY-(value-base)*scale);
+//        float max = value;
+//        float min = value;
+//        while (data.hasNext()) {
+//            d = data.next();
+//            long interv = last - d.second;
+//            if (interv <= 0)
+//                interv += 60000;
+//            startX -= interv/50f;
+//            path.lineTo(startX, startY - (d.value-base)*scale);
+//            last = d.second;
+//            if(d.value > max)
+//                max = d.value;
+//            if(d.value < min)
+//                min = d.value;
+//            if(startX < 0)
+//                break;
+//        }
+//        selectedSensor.max = max;
+//        selectedSensor.min = min;
+//        paint.setStyle(Paint.Style.STROKE);
+//        paint.setColor(Color.BLACK);
+//        paint.setAntiAlias(true);
+//        canvas.drawPath(path, paint);
+//
+//        paint.setAntiAlias(false);
+//        paint.setColor(Color.DKGRAY);
+//        int y = height-XSTART;
+//        canvas.drawLine(width, y, 0, y, paint);
+//        int x = width-XSTART;
+//        canvas.drawLine(x, y-5, x, y, paint);
+//        last = current.second;
+//        int second = (int) (last/1000);
+//        canvas.drawText(""+second+'.'+(last-second*1000), x, y+5, paint);
+//        canvas.drawLine(XSTART, 0, XSTART, height, paint);
+//        canvas.drawText(""+base, 0, startY, paint);
+//        path = new Path();
+//        path.moveTo(width, startY);
+//        path.lineTo(0, startY);
+//        PathEffect pe = new DashPathEffect(new float[]{3, 5}, 0);
+//        paint.setPathEffect(pe);
+//        canvas.drawPath(path, paint);
+//        paint.setPathEffect(null);
+        line.setValues(selectedSensor.getCData());
+//        data.setBaseValue(selectedSensor.min);
+        view.setLineChartData(data);
+//        line.set
     }
 
     public void onLoginDismiss(LoginDialog dialog) {
@@ -254,15 +268,25 @@ public class MainActivity extends Activity {
             connectionManager.connect(dialog.getTheHost(), dialog.getPort(), new ConnectionListerner() {
                 @Override
                 public void onSuccess() {
-                    view = (DrawingView) findViewById(R.id.surface);
-                    bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.RGB_565);
-                    canvas = new Canvas(bitmap);
-                    view.setDrawer(new DrawingView.Drawer() {
-                        @Override
-                        public void draw(Canvas canvas) {
-                            canvas.drawBitmap(bitmap, 0, 0, null);
-                        }
-                    });
+//                    view = (DrawingView) findViewById(R.id.surface);
+                    view = (LineChartView) findViewById(R.id.lineview);
+                    line = new Line();
+                    line.setHasLines(true);
+                    line.setHasPoints(false);
+                    line.setStrokeWidth(1);
+                    data = new LineChartData(Arrays.asList(line));
+                    Axis axisX = new Axis();
+                    Axis axisY = new Axis().setHasLines(true);
+                    data.setAxisXBottom(axisX);
+                    data.setAxisYLeft(axisY);
+//                    bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.RGB_565);
+//                    canvas = new Canvas(bitmap);
+//                    view.setDrawer(new DrawingView.Drawer() {
+//                        @Override
+//                        public void draw(Canvas canvas) {
+//                            canvas.drawBitmap(bitmap, 0, 0, null);
+//                        }
+//                    });
                     connection = connectionManager.getConnection();
 
                     connection.addUpdateListener(new Connection.UpdateListener() {
@@ -280,7 +304,6 @@ public class MainActivity extends Activity {
                                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                                 activeSensor((Sensor) parent.getAdapter().getItem(position));
                                                 draw();
-                                                MainActivity.this.view.postInvalidate();
                                             }
                                         });
                                     }
@@ -294,7 +317,6 @@ public class MainActivity extends Activity {
                                 });
                             }
                             draw();
-                            view.postInvalidate();
                             list.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -302,7 +324,7 @@ public class MainActivity extends Activity {
                                     int last = list.getLastVisiblePosition();
                                     int j = 0;
                                     for (int i = first; i <= last; i++) {
-                                        ((TextView)list.getChildAt(j++)).setText(sensors[i].toString());
+                                        ((TextView) list.getChildAt(j++)).setText(sensors[i].toString());
                                     }
                                 }
                             });
@@ -314,6 +336,10 @@ public class MainActivity extends Activity {
                 @Override
                 public void onFail(Reason reason) {
 
+                }
+            }, new Sensor.Converter<PointValue>() {
+                public PointValue convert(Sensor.Data data) {
+                    return new PointValue(data.minute*60000+data.second, data.value);
                 }
             });
         }

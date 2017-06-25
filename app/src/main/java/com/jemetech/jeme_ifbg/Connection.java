@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Connection {
 
+    private final Sensor.Converter<?> converter;
     private Sensor[] sensors;
     private Socket socket;
     private byte[] header = new byte[4];
@@ -29,7 +30,8 @@ public class Connection {
     private ISaver saver;
     private ISaver pendingSaver;
 
-    public Connection() {
+    public Connection(Sensor.Converter<?> converter) {
+        this.converter = converter;
         ByteBuffer buffer = ByteBuffer.wrap(header);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
         headBuffer = buffer.asIntBuffer();
@@ -85,8 +87,10 @@ public class Connection {
                             short size = buffer.getShort();
                             short id = buffer.getShort();
                             int freq = buffer.getInt();
-                            if (sensors[i] == null)
+                            if (sensors[i] == null) {
                                 sensors[i] = new Sensor(id);
+                                sensors[i].setConverter(converter);
+                            }
                             short year = buffer.getShort();
                             short month = buffer.get();
                             short day = buffer.get();

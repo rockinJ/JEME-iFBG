@@ -3,6 +3,7 @@ package com.jemetech.jeme_ifbg;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -10,12 +11,13 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created by Lei on 11/29/2016.
  */
 
-public class Sensor {
+public class Sensor<T> {
 
     private static final int size = 400;
     private final String name;
     private final int id;
     private Deque<Data> data = new LinkedList<>();
+    private LinkedList<T> cData = new LinkedList<>();
     private boolean full;
     private Lock lock = new ReentrantLock();
     private Data last;
@@ -24,6 +26,7 @@ public class Sensor {
     public float min;
     private boolean maxSet;
     private boolean minSet;
+    private Converter<T> converter;
 
     public Sensor(String name, int id) {
         this.name = name;
@@ -60,8 +63,12 @@ public class Sensor {
             min = d.value;
         lock.lock();
         data.add(d);
-        if (full)
+        T cd = converter.convert(d);
+        cData.add(cd);
+        if (full) {
             data.poll();
+            cData.poll();
+        }
         else if (data.size() == size)
             full = true;
         lock.unlock();
@@ -78,6 +85,17 @@ public class Sensor {
         Deque<Data> data = (Deque) ((LinkedList)this.data).clone();
         lock.unlock();
         return data.descendingIterator();
+    }
+
+    public void setConverter(Converter<T> converter) {
+        this.converter = converter;
+    }
+
+    public List<T> getCData() {
+        lock.lock();
+        List<T> cd = (List<T>) cData.clone();
+        lock.unlock();
+        return cd;
     }
 
     public static class Data {
@@ -97,5 +115,9 @@ public class Sensor {
             this.second = second;
             this.value = value;
         }
+    }
+
+    public static interface Converter<T> {
+        T convert(Data data);
     }
 }

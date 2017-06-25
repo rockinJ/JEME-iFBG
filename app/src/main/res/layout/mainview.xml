@@ -6,7 +6,7 @@
     android:id="@+id/mainview">
 
     <LinearLayout
-        android:layout_width="1.5in"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
@@ -19,7 +19,7 @@
             android:listSelector="@color/colorPrimaryDark" />
 
         <GridLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingLeft="0.15in"
             android:paddingRight="0.15in">
@@ -39,11 +39,17 @@
                 android:text="@string/finish" />
         </GridLayout>
     </LinearLayout>
-
+<!--
     <com.jemetech.jeme_ifbg.android.DrawingView
         android:id="@+id/surface"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_weight="1" />
-
+!-->
+    <lecho.lib.hellocharts.view.LineChartView
+        android:id="@+id/lineview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:paddingLeft="10dp" />
 </LinearLayout>
